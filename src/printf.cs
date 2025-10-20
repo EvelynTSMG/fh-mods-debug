@@ -45,17 +45,14 @@ public unsafe class FhDebugPrintModule : FhModule {
     private readonly FhMethodHandle<PrintfVarargDelegate> _h_AtelPs2DebugString2;
 
     public FhDebugPrintModule() {
-        FhMethodLocation location_dbgPrintf    = new(0x22F6B0, 0x9ADD0);
+        FhMethodLocation location_dbgPrintf = new(0x22F6B0, 0x9ADD0);
+        _h_dbgPrintf = new FhMethodHandle<PrintfVarargDelegate>(this, location_dbgPrintf, h_printf);
 
-        _h_dbgPrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, location_dbgPrintf, h_printf);
-
-        if (FhGlobal.game_type == FhGameType.FFX) {
-            _h_PhyrePrintf         = new FhMethodHandle<PhyrePrintfDelegate> (this, "FFX.exe", 0x0353F0, h_pprintf);
-            _h_rcPrint             = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x527550, h_printf);
-            _h_scePrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x22FDA0, h_printf);
-            _h_AtelPs2DebugString  = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C10, h_printf);
-            _h_AtelPs2DebugString2 = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C20, h_printf);
-        }
+        _h_PhyrePrintf         = new FhMethodHandle<PhyrePrintfDelegate> (this, "FFX.exe", 0x0353F0, h_pprintf);
+        _h_rcPrint             = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x527550, h_printf);
+        _h_scePrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x22FDA0, h_printf);
+        _h_AtelPs2DebugString  = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C10, h_printf);
+        _h_AtelPs2DebugString2 = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C20, h_printf);
     }
 
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
