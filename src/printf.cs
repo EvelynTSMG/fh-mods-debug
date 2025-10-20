@@ -29,7 +29,7 @@ internal delegate void PhyrePrintfDelegate(int rc, string fmt,
 ///     <para/>
 ///     Do not interface with this module directly. It is self-contained.
 /// </summary>
-[FhLoad(FhGameType.FFX)]
+[FhLoad(FhGameType.FFX | FhGameType.FFX2)]
 public unsafe class FhDebugPrintModule : FhModule {
 
     /* [fkelava 17/7/25 02:33]
@@ -45,12 +45,17 @@ public unsafe class FhDebugPrintModule : FhModule {
     private readonly FhMethodHandle<PrintfVarargDelegate> _h_AtelPs2DebugString2;
 
     public FhDebugPrintModule() {
-        _h_PhyrePrintf         = new FhMethodHandle<PhyrePrintfDelegate> (this, "FFX.exe", 0x0353F0, h_pprintf);
-        _h_rcPrint             = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x527550, h_printf);
-        _h_dbgPrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x22F6B0, h_printf);
-        _h_scePrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x22FDA0, h_printf);
-        _h_AtelPs2DebugString  = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C10, h_printf);
-        _h_AtelPs2DebugString2 = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C20, h_printf);
+        FhMethodLocation location_dbgPrintf = new(0x22F6B0, 0x9ADD0);
+
+        _h_dbgPrintf = new FhMethodHandle<PrintfVarargDelegate>(this, location_dbgPrintf, h_printf);
+
+        if (FhGlobal.game_type == FhGameType.FFX) {
+            _h_PhyrePrintf         = new FhMethodHandle<PhyrePrintfDelegate> (this, "FFX.exe", 0x0353F0, h_pprintf);
+            _h_rcPrint             = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x527550, h_printf);
+            _h_scePrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x22FDA0, h_printf);
+            _h_AtelPs2DebugString  = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C10, h_printf);
+            _h_AtelPs2DebugString2 = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C20, h_printf);
+        }
     }
 
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
@@ -84,11 +89,15 @@ public unsafe class FhDebugPrintModule : FhModule {
     }
 
     public override bool init(FhModContext mod_context, FileStream global_state_file) {
-        return _h_PhyrePrintf        .hook() &&
-               _h_rcPrint            .hook() &&
-               _h_dbgPrintf          .hook() &&
-               _h_scePrintf          .hook() &&
-               _h_AtelPs2DebugString .hook() &&
-               _h_AtelPs2DebugString2.hook();
+        return FhGlobal.game_type switch {
+            FhGameType.FFX => _h_PhyrePrintf         .hook() &&
+                               _h_rcPrint            .hook() &&
+                               _h_dbgPrintf          .hook() &&
+                               _h_scePrintf          .hook() &&
+                               _h_AtelPs2DebugString .hook() &&
+                               _h_AtelPs2DebugString2.hook(),
+
+            FhGameType.FFX2 => _h_dbgPrintf.hook(),
+        };
     }
 }
