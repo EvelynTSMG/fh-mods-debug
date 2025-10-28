@@ -29,7 +29,7 @@ internal delegate void PhyrePrintfDelegate(int rc, string fmt,
 ///     <para/>
 ///     Do not interface with this module directly. It is self-contained.
 /// </summary>
-[FhLoad(FhGameType.FFX | FhGameType.FFX2)]
+[FhLoad(FhGameId.FFX | FhGameId.FFX2)]
 public unsafe class FhDebugPrintModule : FhModule {
 
     /* [fkelava 17/7/25 02:33]
@@ -49,7 +49,7 @@ public unsafe class FhDebugPrintModule : FhModule {
 
         _h_dbgPrintf = new FhMethodHandle<PrintfVarargDelegate>(this, location_dbgPrintf, h_printf);
 
-        if (FhGlobal.game_type == FhGameType.FFX) {
+        if (FhGlobal.game_id == FhGameId.FFX) {
             _h_PhyrePrintf         = new FhMethodHandle<PhyrePrintfDelegate> (this, "FFX.exe", 0x0353F0, h_pprintf);
             _h_rcPrint             = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x527550, h_printf);
             _h_scePrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x22FDA0, h_printf);
@@ -89,15 +89,15 @@ public unsafe class FhDebugPrintModule : FhModule {
     }
 
     public override bool init(FhModContext mod_context, FileStream global_state_file) {
-        return FhGlobal.game_type switch {
-            FhGameType.FFX => _h_PhyrePrintf         .hook() &&
-                               _h_rcPrint            .hook() &&
-                               _h_dbgPrintf          .hook() &&
-                               _h_scePrintf          .hook() &&
-                               _h_AtelPs2DebugString .hook() &&
-                               _h_AtelPs2DebugString2.hook(),
+        return FhGlobal.game_id switch {
+            FhGameId.FFX => _h_PhyrePrintf        .hook() &&
+                            _h_rcPrint            .hook() &&
+                            _h_dbgPrintf          .hook() &&
+                            _h_scePrintf          .hook() &&
+                            _h_AtelPs2DebugString .hook() &&
+                            _h_AtelPs2DebugString2.hook(),
 
-            FhGameType.FFX2 => _h_dbgPrintf.hook(),
+            FhGameId.FFX2 => _h_dbgPrintf.hook(),
         };
     }
 }
