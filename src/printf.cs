@@ -45,17 +45,19 @@ public unsafe class FhDebugPrintModule : FhModule {
     private readonly FhMethodHandle<PrintfVarargDelegate> _h_AtelPs2DebugString2;
 
     public FhDebugPrintModule() {
-        FhMethodLocation location_dbgPrintf = new(0x22F6B0, 0x9ADD0);
+        FhMethodLocation location_dbgPrintf           = new(0x22F6B0, 0x9ADD0);
+        FhMethodLocation location_scePrintf           = new(0x22FDA0, 0x9B4B0);
+        FhMethodLocation location_AtelPs2DebugString  = new(0x473C10, 0x30E9E0);
+        FhMethodLocation location_AtelPs2DebugString2 = new(0x473C20, 0x30E9F0);
+        FhMethodLocation location_rcPrint             = new(0x527550, 0x3D9690);
+        FhMethodLocation location_PhyrePrintf         = new(0x0353F0, 0x48CC60);
 
-        _h_dbgPrintf = new FhMethodHandle<PrintfVarargDelegate>(this, location_dbgPrintf, h_printf);
-
-        if (FhGlobal.game_id == FhGameId.FFX) {
-            _h_PhyrePrintf         = new FhMethodHandle<PhyrePrintfDelegate> (this, "FFX.exe", 0x0353F0, h_pprintf);
-            _h_rcPrint             = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x527550, h_printf);
-            _h_scePrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x22FDA0, h_printf);
-            _h_AtelPs2DebugString  = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C10, h_printf);
-            _h_AtelPs2DebugString2 = new FhMethodHandle<PrintfVarargDelegate>(this, "FFX.exe", 0x473C20, h_printf);
-        }
+        _h_dbgPrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, location_dbgPrintf,           h_printf);
+        _h_scePrintf           = new FhMethodHandle<PrintfVarargDelegate>(this, location_scePrintf,           h_printf);
+        _h_AtelPs2DebugString  = new FhMethodHandle<PrintfVarargDelegate>(this, location_AtelPs2DebugString,  h_printf);
+        _h_AtelPs2DebugString2 = new FhMethodHandle<PrintfVarargDelegate>(this, location_AtelPs2DebugString2, h_printf);
+        _h_rcPrint             = new FhMethodHandle<PrintfVarargDelegate>(this, location_rcPrint,             h_printf);
+        _h_PhyrePrintf         = new FhMethodHandle<PhyrePrintfDelegate> (this, location_PhyrePrintf,         h_pprintf);
     }
 
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
@@ -89,15 +91,11 @@ public unsafe class FhDebugPrintModule : FhModule {
     }
 
     public override bool init(FhModContext mod_context, FileStream global_state_file) {
-        return FhGlobal.game_id switch {
-            FhGameId.FFX => _h_PhyrePrintf        .hook() &&
-                            _h_rcPrint            .hook() &&
-                            _h_dbgPrintf          .hook() &&
-                            _h_scePrintf          .hook() &&
-                            _h_AtelPs2DebugString .hook() &&
-                            _h_AtelPs2DebugString2.hook(),
-
-            FhGameId.FFX2 => _h_dbgPrintf.hook(),
-        };
+        return _h_PhyrePrintf        .hook() &&
+               _h_rcPrint            .hook() &&
+               _h_dbgPrintf          .hook() &&
+               _h_scePrintf          .hook() &&
+               _h_AtelPs2DebugString .hook() &&
+               _h_AtelPs2DebugString2.hook();
     }
 }

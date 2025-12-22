@@ -8,6 +8,7 @@
 global using System;
 global using System.IO;
 global using System.Runtime.InteropServices;
+global using System.Runtime.CompilerServices;
 
 global using Fahrenheit.Core;
 
